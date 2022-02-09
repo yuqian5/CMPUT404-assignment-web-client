@@ -23,7 +23,7 @@ import sys
 
 
 # you may use urllib to encode data appropriately
-from urllib.parse import urlparse, quote_plus
+from urllib.parse import urlparse
 
 from httputility import *
 
@@ -81,8 +81,12 @@ class HTTPClient(object):
         # establish a socket connection
         self.connect(request.hostname, request.port if request.port is not None else 80)
 
+        # get query
+        body = args_2_url_encode(args)
+        query = f"{request.query}{'&' if request.query != '' and body != '' else ''}{body}"
+
         # forming request header
-        get_request = f"GET {request.path if request.path != '' else '/'}{'?' if request.query != '' else ''}{quote_plus(request.query)} HTTP/1.1\r\nHost: {quote_plus(request.hostname)}\r\nUser-Agent: SAWC/1.1\r\nConnection: close\r\n\r\n"
+        get_request = f"GET {request.path if request.path != '' else '/'}{'?' if query != ''  else ''}{query} HTTP/1.1\r\nHost: {request.hostname}\r\nUser-Agent: SAWC/1.1\r\nConnection: close\r\n\r\n"
 
         # send request
         self.sendall(get_request)
@@ -105,7 +109,7 @@ class HTTPClient(object):
         body = args_2_url_encode(args)
 
         # forming request header
-        post_request = f"POST {request.path if request.path != '' else '/'}{'?' if request.query != '' else ''}{quote_plus(request.query)} HTTP/1.1\r\nHost: {quote_plus(request.hostname)}\r\nUser-Agent: SAWC/1.1\r\nConnection: close\r\n"
+        post_request = f"POST {request.path if request.path != '' else '/'}{'?' if request.query != '' else ''}{request.query} HTTP/1.1\r\nHost: {request.hostname}\r\nUser-Agent: SAWC/1.1\r\nConnection: close\r\n"
         post_request += f"Content-Type: application/x-www-form-urlencoded\r\nContent-Length: {len(body)}\r\n\r\n"
         post_request += body
 

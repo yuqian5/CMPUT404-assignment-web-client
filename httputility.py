@@ -1,3 +1,6 @@
+from urllib.parse import quote_plus
+
+
 def parse_response(resp):
     header, body = resp.split("\r\n\r\n")
     parts = header.split("\r\n")
@@ -39,7 +42,7 @@ def args_2_url_encode(args):
     result = ""
 
     for i in args:
-        result += f"{i}={args[i]}&"
+        result += f"{quote_plus(i)}={quote_plus(args[i])}&"
 
     return result[:-1]
 
